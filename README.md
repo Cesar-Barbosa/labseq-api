@@ -1,59 +1,72 @@
-# labseq-api
+# Labseq API – Quarkus
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+This is a RESTful API developed in Java using the Quarkus framework.  
+It calculates the `labseq(n)` sequence based on the following logic:
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+n = 0 => 0
+n = 1 => 1
+n = 2 => 0
+n = 3 => 1
+n > 3 => labseq(n) = labseq(n - 4) + labseq(n - 3)
 
-## Running the application in dev mode
+It supports very large inputs using an iterative approach with in-memory caching and `BigInteger`.
 
-You can run your application in dev mode that enables live coding using:
+## 📦 Technologies
+- Java 17  
+- Quarkus 3.21  
+- RESTEasy Reactive  
+- OpenAPI + Swagger UI  
+- BigInteger (for big number support)  
+- In-memory cache (ConcurrentHashMap)  
 
-```shell script
-./mvnw quarkus:dev
-```
+## ▶️ Run locally (Dev mode)
+```bash
+./mvnw compile quarkus:dev
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+Dev UI is available at:
+👉 http://localhost:8080/q/dev/
 
-## Packaging and running the application
+## 📡 REST Endpoints
 
-The application can be packaged using:
+| Endpoint           | Description                    | Output       |
+|--------------------|--------------------------------|--------------|
+| `/labseq/{n}`      | Returns value as plain text    | String       |
+| `/swagger-ui`      | OpenAPI Documentation (Swagger)| UI Explorer  |
 
-```shell script
+❌ Error Handling
+If n < 0, API returns:
+
+HTTP 400 Bad Request  
+Body: n must be >= 0
+
+📄 Example usage
+curl http://localhost:8080/labseq/10
+# Output: 3
+
+⚙️ Production Build
+Build JVM version:
 ./mvnw package
-```
-
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
-
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
+java -Xmx4G -jar target/quarkus-app/quarkus-run.jar
+Build Uber-Jar:
 ./mvnw package -Dquarkus.package.jar.type=uber-jar
-```
+java -jar target/*-runner.jar
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+🧊 Native Build (optional)
+If using GraalVM:
 
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
 ./mvnw package -Dnative
-```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
+Using Docker container:
 ./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
 
-You can then execute your native executable with: `./target/labseq-api-1.0.0-runner`
+Run:
+./target/labseq-api-1.0.0-runner
 
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
+🌐 Web UI (optional)
+This project includes a simple static HTML file that allows you to input a number and query the API via JavaScript.
+It is available at:
 
-## Related Guides
+http://localhost:8080/index.html
+🧪 Performance Requirement
+This implementation can calculate labseq(100000) in under 10 seconds.
 
-- SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui)): Document your REST APIs with OpenAPI - comes with Swagger UI
-- Cache ([guide](https://quarkus.io/guides/cache)): Enable application data caching in CDI beans
